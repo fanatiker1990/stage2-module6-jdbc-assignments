@@ -34,7 +34,7 @@ public class SimpleJDBCRepository {
         try {
             connection = CustomDataSource.getInstance().getConnection();
             ps = connection.prepareStatement(createUserSQL,Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, user.getId().toString());
+            ps.setLong(1, user.getId());
             ps.setString(2, user.getFirstName());
             ps.setString(3, user.getLastName());
             ps.setInt(4, user.getAge());
@@ -57,6 +57,7 @@ public class SimpleJDBCRepository {
             ResultSet rs = ps.executeQuery();
             User user = new User();
             while (rs.next()) {
+                user.setId(rs.getLong("id"));
                 user.setAge(rs.getInt("age"));
                 user.setFirstName(rs.getString("firstname") );
                 user.setLastName(rs.getString("lastname"));
@@ -79,6 +80,7 @@ public class SimpleJDBCRepository {
             ResultSet rs = ps.executeQuery();
             User user = new User();
             while (rs.next()) {
+                user.setId(rs.getLong("id"));
                 user.setAge(rs.getInt("age"));
                 user.setFirstName(rs.getString("firstname") );
                 user.setLastName(rs.getString("lastname"));
@@ -99,7 +101,7 @@ public class SimpleJDBCRepository {
             ResultSet rs = st.executeQuery(findAllUserSQL);
             while (rs.next()) {
                 User user = new User();
-                user.setId(Long.getLong(rs.getString("id")));
+                user.setId(rs.getLong("id"));
                 user.setAge(rs.getInt("age"));
                 user.setFirstName(rs.getString("firstname") );
                 user.setLastName(rs.getString("lastname"));
