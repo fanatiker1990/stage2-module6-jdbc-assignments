@@ -5,8 +5,10 @@ import javax.sql.DataSource;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Synchronized;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -23,30 +25,28 @@ public class CustomDataSource implements DataSource {
     private final String name;
     private final String password;
 
-
-    private CustomDataSource(String driver, String url,  String name,String password) {
-
+    private CustomDataSource(String driver, String url, String password, String name) {
         this.driver = driver;
+        this.url = url;
         this.name = name;
         this.password = password;
-        this.url = url;
     }
 
     public static CustomDataSource getInstance() {
-        if (instance == null){
-            if (instance == null){
-                try{
-                    Properties properties = new Properties();
-                    properties.load(CustomDataSource.class.getClassLoader().getResourceAsStream("app.properties"));
-                    instance = new CustomDataSource(
-                            properties.getProperty("postgres.driver"),
-                            properties.getProperty("postgres.url"),
-                            properties.getProperty("postgres.name"),
-                            properties.getProperty("postgres.password")
-                    );
+        synchronized (CustomDataSource.class) {
+            if (instance == null) {
+                Properties prop = new Properties();
+                try (InputStream input = CustomDataSource.class.getClassLoader().getResourceAsStream("app.properties")) {
+                    prop.load(input);
+
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    System.out.println(e);
                 }
+                String driver = prop.getProperty("postgres.driver");
+                String url = prop.getProperty("postgres.url");
+                String password = prop.getProperty("postgres.password");
+                String name = prop.getProperty("postgres.name");
+                instance = new CustomDataSource(driver, url, password, name);
             }
         }
 
@@ -55,47 +55,48 @@ public class CustomDataSource implements DataSource {
 
     @Override
     public Connection getConnection() throws SQLException {
-        return new CustomConnector().getConnection(url, name, password);
+        CustomConnector connector = new CustomConnector();
+        return connector.getConnection(url);
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return new CustomConnector().getConnection(url, username, password);
+        CustomConnector connector = new CustomConnector();
+        return connector.getConnection(url, username, password);
     }
 
     @Override
     public PrintWriter getLogWriter() throws SQLException {
-        throw new SQLException();
+        return null;
     }
 
     @Override
     public void setLogWriter(PrintWriter out) throws SQLException {
-        throw new SQLException();
+
     }
 
     @Override
     public void setLoginTimeout(int seconds) throws SQLException {
-        throw new SQLException();
+
     }
 
     @Override
     public int getLoginTimeout() throws SQLException {
-        throw new SQLException();
+        return 0;
     }
 
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        throw new SQLFeatureNotSupportedException();
+        return null;
     }
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        throw new SQLException();
+        return null;
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        throw new SQLException();
+        return false;
     }
-
 }
