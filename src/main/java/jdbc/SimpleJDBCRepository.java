@@ -19,9 +19,9 @@ public class SimpleJDBCRepository {
     private Statement st = null;
 
     private static final String createUserSQL = "INSERT INTO myusers (Id, firstname, lastname, age) VALUES (?, ?, ?, ?);";
-    private static final String updateUserSQL = "UPDATE myusers SET firstname = ?, lastname = ?, age = ? WHERE Id = ?";
-    private static final String deleteUser = "DELETE FROM myusers WHERE Id = ?";
-    private static final String findUserByIdSQL = "SELECT * FROM myusers WHERE Id = ?";
+    private static final String updateUserSQL = "UPDATE myusers SET firstname = ?, lastname = ?, age = ? WHERE id = ?";
+    private static final String deleteUser = "DELETE FROM myusers WHERE id = ?";
+    private static final String findUserByIdSQL = "SELECT * FROM myusers WHERE id = ?";
     private static final String findUserByNameSQL = "SELECT * FROM myusers WHERE firstname = ?";
     private static final String findAllUserSQL = "SELECT * FROM myusers";
 
@@ -58,7 +58,7 @@ public class SimpleJDBCRepository {
             ResultSet rs = ps.executeQuery();
             User user = new User();
             while (rs.next()) {
-                user.setId(rs.getLong("Id"));
+                user.setId(rs.getLong("id"));
                 user.setAge(rs.getInt("age"));
                 user.setFirstName(rs.getString("firstname") );
                 user.setLastName(rs.getString("lastname"));
@@ -82,7 +82,7 @@ public class SimpleJDBCRepository {
             ResultSet rs = ps.executeQuery();
             User user = new User();
             while (rs.next()) {
-                user.setId(rs.getLong("Id"));
+                user.setId(rs.getLong("id"));
                 user.setAge(rs.getInt("age"));
                 user.setFirstName(rs.getString("firstname") );
                 user.setLastName(rs.getString("lastname"));
@@ -103,7 +103,7 @@ public class SimpleJDBCRepository {
             ResultSet rs = st.executeQuery(findAllUserSQL);
             while (rs.next()) {
                 User user = new User();
-                user.setId(rs.getLong("Id"));
+                user.setId(rs.getLong("id"));
                 user.setAge(rs.getInt("age"));
                 user.setFirstName(rs.getString("firstname") );
                 user.setLastName(rs.getString("lastname"));
