@@ -24,7 +24,7 @@ public class CustomDataSource implements DataSource {
     private final String password;
 
 
-    private CustomDataSource(String driver, String url, String password, String name) {
+    private CustomDataSource(String driver, String url,  String name,String password) {
 
         this.driver = driver;
         this.name = name;
@@ -41,8 +41,8 @@ public class CustomDataSource implements DataSource {
                     instance = new CustomDataSource(
                             properties.getProperty("postgres.driver"),
                             properties.getProperty("postgres.url"),
-                            properties.getProperty("postgres.password"),
-                            properties.getProperty("postgres.name")
+                            properties.getProperty("postgres.name"),
+                            properties.getProperty("postgres.password")
                     );
                 } catch (IOException e) {
                     throw new RuntimeException(e);
