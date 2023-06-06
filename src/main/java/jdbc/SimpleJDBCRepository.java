@@ -18,7 +18,7 @@ public class SimpleJDBCRepository {
     private PreparedStatement ps = null;
     private Statement st = null;
 
-    private static final String createUserSQL = "INSERT INTO myusers (id, firstname, lastname, age) VALUES (?, ?, ?, ?);";
+    private static final String createUserSQL = "INSERT INTO myusers (firstname, lastname, age) VALUES (?, ?, ?);";
     private static final String updateUserSQL = "UPDATE myusers SET firstname = ?, lastname = ?, age = ? WHERE id = ?";
     private static final String deleteUser = "DELETE FROM myusers WHERE id = ?";
     private static final String findUserByIdSQL = "SELECT * FROM myusers WHERE id = ?";
@@ -33,11 +33,10 @@ public class SimpleJDBCRepository {
 
         try {
             connection = CustomDataSource.getInstance().getConnection();
-            ps = connection.prepareStatement(createUserSQL);
-            ps.setLong(1, user.getId());
-            ps.setString(2, user.getFirstName());
-            ps.setString(3, user.getLastName());
-            ps.setInt(4, user.getAge());
+            ps = connection.prepareStatement(createUserSQL,Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, user.getFirstName());
+            ps.setString(2, user.getLastName());
+            ps.setInt(3, user.getAge());
             long val = ps.executeUpdate();
             connection.close();
             return val;
@@ -54,11 +53,9 @@ public class SimpleJDBCRepository {
         try {
             connection = CustomDataSource.getInstance().getConnection();
             ps = connection.prepareStatement(findUserByIdSQL);
-            ps.setLong(1, userId);
             ResultSet rs = ps.executeQuery();
             User user = new User();
             while (rs.next()) {
-                user.setId(rs.getLong("id"));
                 user.setAge(rs.getInt("age"));
                 user.setFirstName(rs.getString("firstname") );
                 user.setLastName(rs.getString("lastname"));
@@ -78,11 +75,9 @@ public class SimpleJDBCRepository {
         try {
             connection = CustomDataSource.getInstance().getConnection();
             ps = connection.prepareStatement(findUserByNameSQL);
-            ps.setString(1, userName);
             ResultSet rs = ps.executeQuery();
             User user = new User();
             while (rs.next()) {
-                user.setId(rs.getLong("id"));
                 user.setAge(rs.getInt("age"));
                 user.setFirstName(rs.getString("firstname") );
                 user.setLastName(rs.getString("lastname"));
