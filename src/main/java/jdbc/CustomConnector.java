@@ -3,31 +3,23 @@ package jdbc;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 
 public class CustomConnector {
-    public Connection getConnection(String url) throws SQLException {
-        Connection conn = null;
+    public Connection getConnection(String url) {
         try {
-            conn = DriverManager.getConnection(url);
+            return DriverManager.getConnection(url);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return conn;
+        return null;
     }
 
-    public Connection getConnection(String url, String user, String password) throws SQLException  {
-        Connection conn = null;
-
+    public Connection getConnection(String url, String user, String password) {
         try {
-            Properties props = new Properties();
-            props.setProperty("user", user);
-            props.setProperty("password", password);
-            conn = DriverManager.getConnection(url, props);
+            return DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return conn;
+        return null;
     }
 }
