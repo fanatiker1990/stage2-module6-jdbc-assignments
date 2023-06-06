@@ -1,13 +1,14 @@
+
 package jdbc;
+
+import javax.sql.DataSource;
+
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.sql.DataSource;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
@@ -19,45 +20,47 @@ public class CustomDataSource implements DataSource {
     private static volatile CustomDataSource instance;
     private final String driver;
     private final String url;
-    private final String username;
+    private final String name;
     private final String password;
 
-    private CustomDataSource() {
-        Properties properties = new Properties();
-        try (FileInputStream fis = new FileInputStream("src/main/resources/app.properties")) {
-            properties.load(fis);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        driver = properties.getProperty("postgres.driver");
-        url = properties.getProperty("postgres.url");
-        username = properties.getProperty("postgres.name");
-        password = properties.getProperty("postgres.password");
-        try {
-            Class.forName(driver);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+
+    private CustomDataSource(String driver, String url, String password, String name) {
+
+        this.driver = driver;
+        this.name = name;
+        this.password = password;
+        this.url = url;
     }
 
     public static CustomDataSource getInstance() {
-        if (instance == null) {
-            synchronized (CustomDataSource.class) {
-                if (instance == null) {
-                    instance = new CustomDataSource();
+        if (instance == null){
+            if (instance == null){
+                try{
+                    Properties properties = new Properties();
+                    properties.load(CustomDataSource.class.getClassLoader().getResourceAsStream("app.properties"));
+                    instance = new CustomDataSource(
+                            properties.getProperty("postgres.driver"),
+                            properties.getProperty("postgres.url"),
+                            properties.getProperty("postgres.password"),
+                            properties.getProperty("postgres.name")
+                    );
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }
+
         return instance;
     }
+
     @Override
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url, username, password);
+        return new CustomConnector().getConnection(url, name, password);
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return DriverManager.getConnection(url, username, password);
+        return new CustomConnector().getConnection(url, username, password);
     }
 
     @Override
@@ -66,15 +69,13 @@ public class CustomDataSource implements DataSource {
     }
 
     @Override
-    public void setLogWriter(PrintWriter printWriter) throws SQLException {
+    public void setLogWriter(PrintWriter out) throws SQLException {
         throw new SQLException();
-
     }
 
     @Override
-    public void setLoginTimeout(int i) throws SQLException {
+    public void setLoginTimeout(int seconds) throws SQLException {
         throw new SQLException();
-
     }
 
     @Override
@@ -88,12 +89,13 @@ public class CustomDataSource implements DataSource {
     }
 
     @Override
-    public <T> T unwrap(Class<T> aClass) throws SQLException {
+    public <T> T unwrap(Class<T> iface) throws SQLException {
         throw new SQLException();
     }
 
     @Override
-    public boolean isWrapperFor(Class<?> aClass) throws SQLException {
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
         throw new SQLException();
     }
+
 }
