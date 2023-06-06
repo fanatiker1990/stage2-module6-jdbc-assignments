@@ -3,23 +3,36 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.sql.DataSource;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 @Getter
 @Setter
 public class CustomDataSource implements DataSource {
     private static volatile CustomDataSource instance;
-    private final String driver = "org.postgresql.Driver";
-    private final String url = "jdbc:postgresql://localhost:5432/myfirstdb";
-    private final String name = "postgres";
-    private final String password = "w9821645";
+    private final String driver;
+    private final String url;
+    private final String username;
+    private final String password;
 
     private CustomDataSource() {
+        Properties properties = new Properties();
+        try (FileInputStream fis = new FileInputStream("src/main/resources/app.properties")) {
+            properties.load(fis);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        driver = properties.getProperty("postgres.driver");
+        url = properties.getProperty("postgres.url");
+        username = properties.getProperty("postgres.name");
+        password = properties.getProperty("postgres.password");
         try {
             Class.forName(driver);
         } catch (ClassNotFoundException e) {
@@ -37,10 +50,9 @@ public class CustomDataSource implements DataSource {
         }
         return instance;
     }
-
     @Override
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url, name, password);
+        return DriverManager.getConnection(url, username, password);
     }
 
     @Override
