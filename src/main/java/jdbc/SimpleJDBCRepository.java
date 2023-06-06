@@ -18,7 +18,7 @@ public class SimpleJDBCRepository {
     private PreparedStatement ps = null;
     private Statement st = null;
 
-    private static final String createUserSQL = "INSERT INTO myusers (Id, firstname, lastname, age) VALUES (DEFAULT, ?, ?, ?);";
+    private static final String createUserSQL = "INSERT INTO myusers (id, firstname, lastname, age) VALUES (DEFAULT, ?, ?, ?);";
     private static final String updateUserSQL = "UPDATE myusers SET firstname = ?, lastname = ?, age = ? WHERE id = ?";
     private static final String deleteUser = "DELETE FROM myusers WHERE id = ?";
     private static final String findUserByIdSQL = "SELECT * FROM myusers WHERE id = ?";
