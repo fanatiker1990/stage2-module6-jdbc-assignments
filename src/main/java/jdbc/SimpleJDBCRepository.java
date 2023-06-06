@@ -74,7 +74,7 @@ public class SimpleJDBCRepository {
         return null;
     }
 
-    public List<User> findAllUsers() {
+    public List<User> findAllUser() {
         List<User> users = new ArrayList<>();
         try {
             connection = CustomDataSource.getInstance().getConnection();
