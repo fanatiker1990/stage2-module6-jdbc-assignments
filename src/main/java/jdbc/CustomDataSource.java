@@ -22,17 +22,11 @@ public class CustomDataSource implements DataSource {
     private final String username;
     private final String password;
 
-    private CustomDataSource() {
-        Properties properties = new Properties();
-        try (FileInputStream fis = new FileInputStream("src/main/resources/app.properties")) {
-            properties.load(fis);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        driver = properties.getProperty("postgres.driver");
-        url = properties.getProperty("postgres.url");
-        username = properties.getProperty("postgres.name");
-        password = properties.getProperty("postgres.password");
+    private CustomDataSource(String driver, String url, String username, String password) {
+        this.driver = driver;
+        this.url = url;
+        this.username = username;
+        this.password = password;
         try {
             Class.forName(driver);
         } catch (ClassNotFoundException e) {
@@ -44,7 +38,17 @@ public class CustomDataSource implements DataSource {
         if (instance == null) {
             synchronized (CustomDataSource.class) {
                 if (instance == null) {
-                    instance = new CustomDataSource();
+                    Properties properties = new Properties();
+                    try (FileInputStream fis = new FileInputStream("src/main/resources/app.properties")) {
+                        properties.load(fis);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    String driver = properties.getProperty("postgres.driver");
+                    String url = properties.getProperty("postgres.url");
+                    String username = properties.getProperty("postgres.name");
+                    String password = properties.getProperty("postgres.password");
+                    instance = new CustomDataSource(driver,url,username,password);
                 }
             }
         }
