@@ -18,18 +18,37 @@ public class SimpleJDBCRepository {
     private PreparedStatement ps = null;
     private Statement st = null;
 
-    private static final String createUserSQL = "INSERT INTO myusers (firstname, lastname, age) VALUES (?, ?, ?)";
-    private static final String updateUserSQL = "UPDATE myusers SET firstname = ?, lastname = ?, age = ? WHERE id = ?";
-    private static final String deleteUser = "DELETE FROM myusers WHERE id = ?";
-    private static final String findUserByIdSQL = "SELECT * FROM myusers WHERE id = ?";
-    private static final String findUserByNameSQL = "SELECT * FROM myusers WHERE firstname = ?";
-    private static final String findAllUserSQL = "SELECT * FROM myusers";
+    private static final String CREATE_USER_SQL = """
+            INSERT INTO myusers(
+            firstname, lastname, age)
+            VALUES (?, ?, ?);
+            """;
+    private static final String UPDATE_USER_SQL = """
+            UPDATE myusers
+            SET firstname=?, lastname=?, age=?
+            WHERE id = ?
+            """;
+    private static final String DELETE_USER = """
+            DELETE FROM public.myusers
+            WHERE id = ?
+            """;
+    private static final String FIND_USER_BY_ID_SQL = """
+            SELECT id, firstname, lastname, age FROM myusers
+            WHERE id = ?
+            """;
+    private static final String FIND_USER_BY_NAME_SQL = """
+            SELECT id, firstname, lastname, age FROM myusers
+            WHERE firstname LIKE CONCAT('%', ?, '%')
+            """;
+    private static final String FIND_ALL_USER_SQL = """
+            SELECT id, firstname, lastname, age FROM myusers
+            """;
 
 
     public Long createUser(User user){
         try {
             connection = CustomDataSource.getInstance().getConnection();
-            ps = connection.prepareStatement(createUserSQL,Statement.RETURN_GENERATED_KEYS);
+            ps = connection.prepareStatement(CREATE_USER_SQL,Statement.RETURN_GENERATED_KEYS);
             //ps.setLong(1, user.getId());
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
@@ -55,7 +74,7 @@ public class SimpleJDBCRepository {
 
         try {
             connection = CustomDataSource.getInstance().getConnection();
-            ps = connection.prepareStatement(findUserByIdSQL);
+            ps = connection.prepareStatement(FIND_USER_BY_ID_SQL);
             ps.setLong(1, userId);
             ResultSet rs = ps.executeQuery();
             User user = new User();
@@ -79,7 +98,7 @@ public class SimpleJDBCRepository {
         }
         try {
             connection = CustomDataSource.getInstance().getConnection();
-            ps = connection.prepareStatement(findUserByNameSQL);
+            ps = connection.prepareStatement(FIND_USER_BY_NAME_SQL);
             ps.setString(1, userName);
             ResultSet rs = ps.executeQuery();
             User user = new User();
@@ -102,7 +121,7 @@ public class SimpleJDBCRepository {
         try {
             connection = CustomDataSource.getInstance().getConnection();
             st = connection.createStatement();
-            ResultSet rs = st.executeQuery(findAllUserSQL);
+            ResultSet rs = st.executeQuery(FIND_ALL_USER_SQL);
             while (rs.next()) {
                 User user = new User();
                 user.setId(rs.getLong("id"));
@@ -125,7 +144,7 @@ public class SimpleJDBCRepository {
 
         try {
             connection = CustomDataSource.getInstance().getConnection();
-            ps = connection.prepareStatement(updateUserSQL);
+            ps = connection.prepareStatement(UPDATE_USER_SQL);
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setInt(3, user.getAge());
@@ -146,7 +165,7 @@ public class SimpleJDBCRepository {
 
         try {
             connection = CustomDataSource.getInstance().getConnection();
-            ps = connection.prepareStatement(deleteUser);
+            ps = connection.prepareStatement(DELETE_USER);
             ps.setLong(1, userId);
             ps.executeUpdate();
             connection.close();
