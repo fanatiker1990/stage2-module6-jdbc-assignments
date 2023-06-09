@@ -26,29 +26,30 @@ public class SimpleJDBCRepository {
     private static final String UPDATE_USER_SQL = """
             UPDATE myusers
             SET firstname=?, lastname=?, age=?
-            WHERE id = ?
+            WHERE id = ?;
             """;
     private static final String DELETE_USER = """
             DELETE FROM public.myusers
-            WHERE id = ?
+            WHERE id = ?;
             """;
     private static final String FIND_USER_BY_ID_SQL = """
             SELECT id, firstname, lastname, age FROM myusers
-            WHERE id = ?
+            WHERE id = ?;
             """;
     private static final String FIND_USER_BY_NAME_SQL = """
             SELECT id, firstname, lastname, age FROM myusers
-            WHERE firstname LIKE CONCAT('%', ?, '%')
+            WHERE firstname LIKE CONCAT('%', ?, '%');
             """;
     private static final String FIND_ALL_USER_SQL = """
-            SELECT id, firstname, lastname, age FROM myusers
+            SELECT id, firstname, lastname, age FROM myusers;
             """;
 
 
-    public Long createUser(User user){
+    public Long createUser(User user) {
+
         try {
             connection = CustomDataSource.getInstance().getConnection();
-            ps = connection.prepareStatement(CREATE_USER_SQL,Statement.RETURN_GENERATED_KEYS);
+            ps = connection.prepareStatement(CREATE_USER_SQL, Statement.RETURN_GENERATED_KEYS);
             //ps.setLong(1, user.getId());
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
@@ -57,17 +58,17 @@ public class SimpleJDBCRepository {
 
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
-                Long generatedId = generatedKeys.getLong(1);
-                return generatedId;
+                return generatedKeys.getLong(1);
             } else {
                 throw new SQLException("Failed to create user. No generated ID obtained.");
             }
         } catch (SQLException | NullPointerException e) {
             throw new RuntimeException(e);
         }
+
     }
 
-    public User findUserById(Long userId){
+    public User findUserById(Long userId) {
         if (userId == null) {
             return null;
         }
@@ -81,7 +82,7 @@ public class SimpleJDBCRepository {
             while (rs.next()) {
                 user.setId(rs.getLong("id"));
                 user.setAge(rs.getInt("age"));
-                user.setFirstName(rs.getString("firstname") );
+                user.setFirstName(rs.getString("firstname"));
                 user.setLastName(rs.getString("lastname"));
             }
             connection.close();
@@ -105,7 +106,7 @@ public class SimpleJDBCRepository {
             while (rs.next()) {
                 user.setId(rs.getLong("id"));
                 user.setAge(rs.getInt("age"));
-                user.setFirstName(rs.getString("firstname") );
+                user.setFirstName(rs.getString("firstname"));
                 user.setLastName(rs.getString("lastname"));
             }
             connection.close();
@@ -126,7 +127,7 @@ public class SimpleJDBCRepository {
                 User user = new User();
                 user.setId(rs.getLong("id"));
                 user.setAge(rs.getInt("age"));
-                user.setFirstName(rs.getString("firstname") );
+                user.setFirstName(rs.getString("firstname"));
                 user.setLastName(rs.getString("lastname"));
                 userList.add(user);
             }
