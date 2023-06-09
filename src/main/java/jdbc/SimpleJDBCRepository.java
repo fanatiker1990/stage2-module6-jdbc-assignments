@@ -69,9 +69,9 @@ public class SimpleJDBCRepository {
     }
 
     public User findUserById(Long userId) {
-        if (userId == null) {
-            return null;
-        }
+//        if (userId == null) {
+//            return null;
+//        }
 
         try {
             connection = CustomDataSource.getInstance().getConnection();
@@ -94,9 +94,9 @@ public class SimpleJDBCRepository {
     }
 
     public User findUserByName(String userName) {
-        if (userName == null) {
-            return null;
-        }
+//        if (userName == null) {
+//            return null;
+//        }
         try {
             connection = CustomDataSource.getInstance().getConnection();
             ps = connection.prepareStatement(FIND_USER_BY_NAME_SQL);
@@ -139,9 +139,9 @@ public class SimpleJDBCRepository {
     }
 
     public User updateUser(User user) {
-        if (user.getId() == null) {
-            return null;
-        }
+//        if (user.getId() == null) {
+//            return null;
+//        }
 
         try {
             connection = CustomDataSource.getInstance().getConnection();
@@ -161,7 +161,7 @@ public class SimpleJDBCRepository {
 
     public void deleteUser(Long userId) {
         if (userId == null) {
-            return;
+            return ;
         }
 
         try {
