@@ -21,7 +21,8 @@ public class SimpleJDBCRepository {
     private static final String CREATE_USER_SQL = """
             INSERT INTO myusers(
             firstname, lastname, age)
-            VALUES (?, ?, ?);
+            VALUES (?, ?, ?)
+            RETURNING id;
             """;
     private static final String UPDATE_USER_SQL = """
             UPDATE myusers
@@ -38,7 +39,7 @@ public class SimpleJDBCRepository {
             """;
     private static final String FIND_USER_BY_NAME_SQL = """
             SELECT id, firstname, lastname, age FROM myusers
-            WHERE firstname LIKE CONCAT('%', ?, '%');
+            WHERE firstname ILIKE '%' || ? || '%';
             """;
     private static final String FIND_ALL_USER_SQL = """
             SELECT id, firstname, lastname, age FROM myusers;
@@ -49,7 +50,6 @@ public class SimpleJDBCRepository {
         try {
             connection = CustomDataSource.getInstance().getConnection();
             ps = connection.prepareStatement(CREATE_USER_SQL, Statement.RETURN_GENERATED_KEYS);
-            //ps.setLong(1, user.getId());
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setInt(3, user.getAge());
@@ -86,7 +86,6 @@ public class SimpleJDBCRepository {
                 user.setFirstName(rs.getString("firstname"));
                 user.setLastName(rs.getString("lastname"));
             }
-            connection.close();
             return user;
         } catch (SQLException | NullPointerException e) {
             throw new RuntimeException(e);
@@ -112,7 +111,6 @@ public class SimpleJDBCRepository {
                 user.setFirstName(rs.getString("firstname"));
                 user.setLastName(rs.getString("lastname"));
             }
-            connection.close();
             return user;
         } catch (SQLException | NullPointerException e) {
             throw new RuntimeException(e);
@@ -161,7 +159,7 @@ public class SimpleJDBCRepository {
             ps.setLong(4, user.getId());
             ps.executeUpdate();
             User changedUser = findUserById(user.getId());
-            connection.close();
+
             return changedUser;
         } catch (SQLException | NullPointerException e) {
             throw new RuntimeException(e);
@@ -180,7 +178,7 @@ public class SimpleJDBCRepository {
             ps = connection.prepareStatement(DELETE_USER);
             ps.setLong(1, userId);
             ps.executeUpdate();
-            connection.close();
+
         } catch (SQLException | NullPointerException e) {
             throw new RuntimeException(e);
         } finally {
