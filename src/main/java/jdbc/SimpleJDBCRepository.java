@@ -160,9 +160,9 @@ public class SimpleJDBCRepository {
     }
 
     public void deleteUser(Long userId) {
-        if (userId == null) {
-            return ;
-        }
+//        if (userId == null) {
+//            return ;
+//        }
 
         try {
             connection = CustomDataSource.getInstance().getConnection();
