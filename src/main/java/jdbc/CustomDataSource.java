@@ -52,12 +52,12 @@ public class CustomDataSource implements DataSource {
     }
     @Override
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url, username, password);
+        return new CustomConnector().getConnection(url, username, password);
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return DriverManager.getConnection(url, username, password);
+        return new CustomConnector().getConnection(url, username, password);
     }
 
     @Override
