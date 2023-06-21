@@ -18,12 +18,7 @@ public class SimpleJDBCRepository {
     private PreparedStatement ps = null;
     private Statement st = null;
 
-    private static final String createUserSQL = """
-            INSERT INTO myusers(
-            firstname, lastname, age)
-            VALUES (?, ?, ?)
-            RETURNING id;
-            """;
+    private static final String createUserSQL = "INSERT INTO myusers(firstname, lastname, age) VALUES (?, ?, ?) RETURNING id;";
     private static final String updateUserSQL = """
             UPDATE myusers
             SET firstname=?, lastname=?, age=?
@@ -48,12 +43,11 @@ public class SimpleJDBCRepository {
 
     public Long createUser(User user) {
         try(Connection connection = CustomDataSource.getInstance().getConnection();
-        PreparedStatement ps = connection.prepareStatement(createUserSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement ps = connection.prepareStatement(createUserSQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setInt(3, user.getAge());
             ps.execute();
-
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
                 return generatedKeys.getLong(1);
