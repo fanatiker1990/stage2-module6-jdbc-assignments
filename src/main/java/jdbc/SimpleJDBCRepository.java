@@ -47,9 +47,8 @@ public class SimpleJDBCRepository {
 
 
     public Long createUser(User user) {
-        try {
-            connection = CustomDataSource.getInstance().getConnection();
-            ps = connection.prepareStatement(createUserSQL, Statement.RETURN_GENERATED_KEYS);
+        try(Connection connection = CustomDataSource.getInstance().getConnection();
+        PreparedStatement ps = connection.prepareStatement(createUserSQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(2, user.getFirstName());
             ps.setString(3, user.getLastName());
             ps.setInt(4, user.getAge());
@@ -63,8 +62,6 @@ public class SimpleJDBCRepository {
             }
         } catch (SQLException | NullPointerException e) {
             throw new RuntimeException(e);
-        } finally {
-            closeResources();
         }
 
     }
@@ -74,9 +71,8 @@ public class SimpleJDBCRepository {
             return null;
         }
 
-        try {
-            connection = CustomDataSource.getInstance().getConnection();
-            ps = connection.prepareStatement(findUserByIdSQL);
+        try (Connection connection = CustomDataSource.getInstance().getConnection();
+             PreparedStatement ps = connection.prepareStatement(findUserByIdSQL)) {
             ps.setLong(1, userId);
             ResultSet rs = ps.executeQuery();
             User user = new User();
@@ -89,19 +85,15 @@ public class SimpleJDBCRepository {
             return user;
         } catch (SQLException | NullPointerException e) {
             throw new RuntimeException(e);
-        }finally {
-            closeResources();
         }
-
     }
 
     public User findUserByName(String userName) {
         if (userName == null) {
             return null;
         }
-        try {
-            connection = CustomDataSource.getInstance().getConnection();
-            ps = connection.prepareStatement(findUserByNameSQL);
+        try (Connection connection = CustomDataSource.getInstance().getConnection();
+             PreparedStatement ps = connection.prepareStatement(findUserByNameSQL)) {
             ps.setString(1, userName);
             ResultSet rs = ps.executeQuery();
             User user = new User();
@@ -114,19 +106,14 @@ public class SimpleJDBCRepository {
             return user;
         } catch (SQLException | NullPointerException e) {
             throw new RuntimeException(e);
-        }finally {
-            closeResources();
         }
-
-
     }
 
     public List<User> findAllUser() {
         List<User> userList = new ArrayList<>();
-        try {
-            connection = CustomDataSource.getInstance().getConnection();
-            st = connection.createStatement();
-            ResultSet rs = st.executeQuery(findAllUserSQL);
+        try(Connection connection = CustomDataSource.getInstance().getConnection();
+            Statement st = connection.createStatement();
+            ResultSet rs = st.executeQuery(findAllUserSQL)) {
             while (rs.next()) {
                 User user = new User();
                 user.setId(rs.getLong("id"));
@@ -138,11 +125,7 @@ public class SimpleJDBCRepository {
             return userList;
         } catch (SQLException | NullPointerException e) {
             throw new RuntimeException(e);
-        }finally {
-            closeResources();
         }
-
-
     }
 
     public User updateUser(User user) {
@@ -150,21 +133,16 @@ public class SimpleJDBCRepository {
             return null;
         }
 
-        try {
-            connection = CustomDataSource.getInstance().getConnection();
-            ps = connection.prepareStatement(updateUserSQL);
+        try (Connection connection = CustomDataSource.getInstance().getConnection();
+             PreparedStatement ps = connection.prepareStatement(updateUserSQL)){
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setInt(3, user.getAge());
             ps.setLong(4, user.getId());
             ps.executeUpdate();
-            User changedUser = findUserById(user.getId());
-
-            return changedUser;
+            return findUserById(user.getId());
         } catch (SQLException | NullPointerException e) {
             throw new RuntimeException(e);
-        } finally {
-            closeResources();
         }
     }
 
@@ -172,33 +150,11 @@ public class SimpleJDBCRepository {
         if (userId == null) {
             return;
         }
-
-        try {
-            connection = CustomDataSource.getInstance().getConnection();
-            ps = connection.prepareStatement(deleteUser);
+        try (Connection connection = CustomDataSource.getInstance().getConnection();
+             PreparedStatement ps = connection.prepareStatement(deleteUser)) {
             ps.setLong(1, userId);
             ps.executeUpdate();
-
         } catch (SQLException | NullPointerException e) {
-            throw new RuntimeException(e);
-        } finally {
-            closeResources();
-        }
-
-    }
-
-    private void closeResources() {
-        try {
-            if (ps != null) {
-                ps.close();
-            }
-            if (st != null) {
-                st.close();
-            }
-            if (connection != null) {
-                connection.close();
-            }
-        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
