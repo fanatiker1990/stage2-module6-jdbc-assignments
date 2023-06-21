@@ -20,8 +20,8 @@ public class SimpleJDBCRepository {
 
     private static final String CREATE_USER_SQL = """
             INSERT INTO myusers(
-            firstname, lastname, age)
-            VALUES (?, ?, ?)
+            id,firstname, lastname, age)
+            VALUES (?,?, ?, ?)
             RETURNING id;
             """;
     private static final String UPDATE_USER_SQL = """
@@ -46,21 +46,22 @@ public class SimpleJDBCRepository {
             """;
 
 
-    public Long createUser(String firstName, String lastName, int age) {
+    public Long createUser(User user) {
         try {
             connection = CustomDataSource.getInstance().getConnection();
-            ps = connection.prepareStatement(CREATE_USER_SQL, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, firstName);
-            ps.setString(2, lastName);
-            ps.setInt(3, age);
+            ps = connection.prepareStatement(CREATE_USER_SQL);
+            ps.setLong(1,user.getId());
+            ps.setString(2, user.getFirstName());
+            ps.setString(3, user.getLastName());
+            ps.setInt(4, user.getAge());
             ps.execute();
-
-            ResultSet generatedKeys = ps.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                return generatedKeys.getLong(1);
-            } else {
-                throw new SQLException("Failed to create user. No generated ID obtained.");
-            }
+            return user.getId();
+            //ResultSet generatedKeys = ps.getGeneratedKeys();
+//            if (generatedKeys.next()) {
+//                return generatedKeys.getLong(1);
+//            } else {
+//                throw new SQLException("Failed to create user. No generated ID obtained.");
+//            }
         } catch (SQLException | NullPointerException e) {
             throw new RuntimeException(e);
         } finally {
