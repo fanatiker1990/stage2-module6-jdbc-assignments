@@ -20,8 +20,8 @@ public class SimpleJDBCRepository {
 
     private static final String createUserSQL = """
             INSERT INTO myusers(
-            firstname, lastname, age)
-            VALUES (?, ?, ?)
+            id,firstname, lastname, age)
+            VALUES (DEFAULT,?, ?, ?)
             RETURNING id;
             """;
     private static final String updateUserSQL = """
@@ -50,9 +50,9 @@ public class SimpleJDBCRepository {
         try {
             connection = CustomDataSource.getInstance().getConnection();
             ps = connection.prepareStatement(createUserSQL, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, user.getFirstName());
-            ps.setString(2, user.getLastName());
-            ps.setInt(3, user.getAge());
+            ps.setString(2, user.getFirstName());
+            ps.setString(3, user.getLastName());
+            ps.setInt(4, user.getAge());
             ps.execute();
 
             ResultSet generatedKeys = ps.getGeneratedKeys();
