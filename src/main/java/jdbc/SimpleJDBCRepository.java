@@ -30,7 +30,7 @@ public class SimpleJDBCRepository {
             WHERE id = ?;
             """;
     private static final String DELETE_USER = """
-            DELETE FROM public.myusers
+            DELETE FROM myusers
             WHERE id = ?;
             """;
     private static final String FIND_USER_BY_ID_SQL = """
