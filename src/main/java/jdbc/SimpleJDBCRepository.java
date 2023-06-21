@@ -46,13 +46,13 @@ public class SimpleJDBCRepository {
             """;
 
 
-    public Long createUser(User user) {
+    public Long createUser(String firstName, String lastName, int age) {
         try {
             connection = CustomDataSource.getInstance().getConnection();
             ps = connection.prepareStatement(CREATE_USER_SQL, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, user.getFirstName());
-            ps.setString(2, user.getLastName());
-            ps.setInt(3, user.getAge());
+            ps.setString(1, firstName);
+            ps.setString(2, lastName);
+            ps.setInt(3, age);
             ps.execute();
 
             ResultSet generatedKeys = ps.getGeneratedKeys();
